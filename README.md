@@ -50,7 +50,7 @@ int main() {
 
 
 2)HashTree
-##HashTree 
+# HashTree 
 A hybrid data structure combining hash-based indexing and tree-like hierarchy for efficient key-value storage, search, and range queries.
 
 ## Overview
