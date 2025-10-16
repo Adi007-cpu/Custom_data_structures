@@ -1,101 +1,142 @@
-# Custom_data_structures
-A collection of custom data structures in C++.
+# ⚙️ Custom Data Structures for Modern C++
 
-1)Adaptive container
-# AdaptiveContainer
+### 🧩 Reimagining the STL — adaptive, hybrid, and high-performance containers in C++
 
-An efficient, adaptive container that dynamically switches between stack-allocated storage and heap-allocated storage based on its size. 
-
-- For small sizes (up to a compile-time `THRESHOLD`), data is stored on the stack for ultra-fast access and minimal overhead.
-- Once the size exceeds the threshold, it promotes to heap storage to handle larger datasets efficiently.
-- When elements are removed and the size falls back below the threshold, it automatically demotes back to stack storage, saving memory.
+![C++](https://img.shields.io/badge/language-C%2B%2B17-blue)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-orange)
 
 ---
 
-## Features
+## 🚀 Overview
 
-- **Hybrid Storage:** Combines the speed of stack allocation with the flexibility of dynamic heap allocation.
-- **Automatic Promotion/Demotion:** Seamlessly switches between stack and heap as container size changes.
-- **Exception-safe Copy/Move semantics:** Implements copy/move constructors and assignment operators.
-- **Standard Container-like API:** Supports `push_back()`, `pop_back()`, `operator[]`, iterators, `reserve()`, and more.
-- **Manual Optimization:** Call `optimize()` to force demotion to stack mode if applicable.
-- **Debug-friendly:** Built-in status printing with `printStatus()`.
+**Custom Data Structures** is an experimental collection of C++ containers designed to explore how standard data structures could evolve beyond fixed models like `std::vector` or `std::unordered_map`.
+
+Each container focuses on:
+- ⚡ **Performance** — cache-friendly and low-overhead  
+- 🔁 **Adaptivity** — dynamically adjusts its behavior based on data size or access pattern  
+- 🧱 **Modern C++ Design** — templates, move semantics, smart pointers, and exception safety  
+
+| Structure | Description | Key Strength |
+|------------|--------------|---------------|
+| **AdaptiveContainer** | Dynamically switches between stack and heap storage | Stack-fast + heap-flexible |
+| **HashTree** | Hybrid of hash map and tree hierarchy | Fast lookups *and* efficient range queries |
 
 ---
 
-## Usage
+## 🧠 1️⃣ AdaptiveContainer
 
+### Overview
+A high-efficiency container that intelligently adapts its storage model.
+
+> 🧩 Inspired by `std::string`’s **Small Buffer Optimization**, but extended to *any* container type.
+
+- For **small sizes**, elements live directly on the **stack**, enabling *ultra-fast access*.  
+- When size exceeds a compile-time threshold, it **promotes** to **heap storage**.  
+- If elements are removed and size drops, it **demotes** back to stack storage automatically.
+
+### ✨ Features
+- 🧠 **Hybrid Storage:** Stack for speed, heap for capacity  
+- 🔁 **Automatic Promotion/Demotion:** Switches modes seamlessly  
+- 🧩 **STL-like Interface:** `push_back()`, `pop_back()`, `operator[]`, `iterators`, `reserve()`  
+- 🛡️ **Exception-safe Copy/Move Semantics**  
+- 🧮 **Manual Optimization:** `optimize()` lets you force a demotion when small  
+- 🧰 **Debug Mode:** `printStatus()` shows current storage mode and size  
+
+### 📘 Example
 ```cpp
 #include "AdaptiveContainer.h"
 #include <iostream>
 
 int main() {
-    AdaptiveContainer<int, 8> container;
+    AdaptiveContainer<int, 8> container;  // stack capacity threshold = 8
 
-    // Add elements
     for (int i = 0; i < 10; ++i)
         container.push_back(i);
 
-    container.printStatus();
+    container.printStatus();  // should show "Heap mode"
 
-    // Remove some elements to trigger demotion
     while (container.size() > 5)
         container.pop_back();
 
-    container.printStatus();
-
-    return 0;
+    container.printStatus();  // should show "Stack mode"
 }
+
+⚙️ Use Cases
+	•	Small, frequently resized buffers
+	•	Embedded or real-time systems where heap usage must be minimized
+	•	Performance-critical algorithms with varying input sizes
+
+⸻
 ```
+🌳 2️⃣ HashTree
 
+Overview
 
-2)HashTree
-# HashTree 
-A hybrid data structure combining hash-based indexing and tree-like hierarchy for efficient key-value storage, search, and range queries.
+A hybrid data structure that merges hash-based indexing with tree-like hierarchy, delivering both lightning-fast lookups and efficient range queries.
 
-## Overview
+Think of it as an unordered_map that can also do lower_bound() efficiently.
 
-**HashTree** offers the speed of hash maps for fast lookups while supporting hierarchical structure for efficient range queries. It splits keys into segments via hashing to organize data in a multi-level tree, allowing:
+Keys are divided into segments via hashing, forming a multi-level hierarchy:
+	•	O(depth) average-time complexity for insert, search, and delete
+	•	Efficient range queries across ordered key intervals
+	•	Memory-safe with std::unique_ptr-managed nodes
 
-- O(depth) average time complexity for insert, search, and delete operations.
-- Efficient range queries to retrieve all key-value pairs within a specified key range.
-- Dynamic, memory-friendly nodes using `std::unordered_map` and smart pointers.
+✨ Features
+	•	⚡ Fast Lookup: O(1) average child access per level
+	•	🌿 Range Queries: Retrieve key intervals efficiently
+	•	🧩 Memory Safety: Smart pointer–based node management
+	•	🛠️ Configurable Depth: Tune for your key distribution and memory budget
 
-This structure is especially useful when you need quick access and partial key range searches, which traditional hash maps alone cannot efficiently provide.
-
-## Features
-
-- **Fast Lookup:** Uses hash functions at each tree level for O(1) child access.
-- **Range Queries:** Retrieve elements in key intervals efficiently.
-- **Memory Safety:** Uses `std::unique_ptr` to manage node lifetimes automatically.
-- **Configurable Depth:** Customize tree depth to balance between speed and memory.
-
-## Usage
-
+📘 Example
 ```cpp
-#include "HashTree.hpp" // or include the class definition directly
-
+#include "HashTree.hpp"
+#include <iostream>
 int main() {
     HashTree<int, std::string> tree(4); // 4-level tree depth
 
-    // Insert key-value pairs
     tree.insert(42, "Answer to everything");
     tree.insert(7, "Lucky number");
     tree.insert(100, "Century");
 
-    // Search for keys
-    auto res = tree.search(42);
-    if (res) {
+    if (auto res = tree.search(42))
         std::cout << "Found: " << res.value() << "\n";
-    }
 
-    // Range query example
     auto results = tree.rangeQuery(5, 50);
-    for (const auto& [key, val] : results) {
+    for (const auto& [key, val] : results)
         std::cout << key << ": " << val << "\n";
-    }
 
-    // Remove a key
     tree.remove(42);
 }
+
+⚙️ Use Cases
+	•	Key-value stores needing both hash-speed and ordered traversal
+	•	Database indexing or caching layers
+	•	Real-time analytics systems
+
+⸻
 ```
+🧪 Future Directions
+	•	🔹 SmartDeque: Adaptive deque with dynamic segmentation
+	•	🔹 ParallelHashTree: Multi-threaded version using lock-free techniques
+	•	🔹 SmallVector<T>: STL-compatible vector with embedded small buffer optimization
+
+💬 Contributions and ideas are welcome!
+If you’ve ever wondered “what if STL containers were smarter?”, this project is for you.
+
+⸻
+
+🧾 License
+
+Released under the MIT License.
+
+⸻
+
+⭐ Get Involved
+	•	Fork the repo and try the containers in your projects
+	•	Suggest a new hybrid data structure idea
+	•	Share benchmarks or real-world performance results
+
+🧩 Together, let’s imagine the next generation of C++ containers.
+
+---
